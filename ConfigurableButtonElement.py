@@ -9,8 +9,8 @@ class ConfigurableButtonElement(ButtonElement):
 
 	def __init__(self, is_momentary, msg_type, channel, identifier):
 		ButtonElement.__init__(self, is_momentary, msg_type, channel, identifier)
-		self._on_value = 127
-		self._off_value = 4
+		self._on_value = 1
+		self._off_value = 0
 		self._is_enabled = True
 		self._is_notifying = False
 		self._force_next_value = False
@@ -36,7 +36,7 @@ class ConfigurableButtonElement(ButtonElement):
 		self.send_value(self._off_value)
 
 	def reset(self):
-		self.send_value(4)
+		self.send_value(0)
 
 	def add_value_listener(self, callback, identify_sender=False):
 		if not self._is_notifying:

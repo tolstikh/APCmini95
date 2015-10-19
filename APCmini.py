@@ -11,12 +11,16 @@ from MainSelectorComponent import MainSelectorComponent
 from M4LInterface import M4LInterface
 import Settings
 
-SIDE_NOTES = (8, 24, 40, 56, 72, 88, 104, 120)
-DRUM_NOTES = (41, 42, 43, 44, 45, 46, 47, 57, 58, 59, 60, 61, 62, 63, 73, 74, 75, 76, 77, 78, 79, 89, 90, 91, 92, 93, 94, 95, 105, 106, 107)
+SIDE_NOTES = (82, 83, 84, 85, 86, 87, 88, 89)
+DRUM_NOTES = (41, 42, 43, 44, 45, 46, 47, 
+			  57, 58, 59, 60, 61, 62, 63, 
+			  73, 74, 75, 76, 77, 78, 79, 
+			  89, 90, 91, 92, 93, 94, 95, 
+			  105, 106, 107)
 DO_COMBINE = Live.Application.combine_apcs()  # requires 8.2 & higher
 
 
-class Launchpad(ControlSurface):
+class APCmini(ControlSurface):
 
 	""" Script for Novation's Launchpad Controller """
 
@@ -35,7 +39,7 @@ class Launchpad(ControlSurface):
 			self._suggested_input_port = 'Launchpad'
 			self._suggested_output_port = 'Launchpad'
 			self._control_is_with_automap = False
-			self._user_byte_write_button = ButtonElement(is_momentary, MIDI_CC_TYPE, 0, 16)
+			self._user_byte_write_button = ButtonElement(is_momentary, MIDI_CC_TYPE, 0, 16)		# Apparently this CC is used to enable feedback, ie lighting up buttons that you pressed
 			self._user_byte_write_button.name = 'User_Byte_Button'
 			self._user_byte_write_button.send_value(1)
 			self._user_byte_write_button.add_value_listener(self._user_byte_value)
@@ -46,15 +50,15 @@ class Launchpad(ControlSurface):
 			for row in range(8):
 				button_row = []
 				for column in range(8):
-					button = ConfigurableButtonElement(is_momentary, MIDI_NOTE_TYPE, 0, row * 16 + column)
+					button = ConfigurableButtonElement(is_momentary, MIDI_NOTE_TYPE, 0, (7-row) * 8 + column)	# APCmini rows are in reverse order from Launchpad
 					button.name = str(column) + '_Clip_' + str(row) + '_Button'
 					button_row.append(button)
 
 				matrix.add_row(tuple(button_row))
 
-			self._config_button = ButtonElement(is_momentary, MIDI_CC_TYPE, 0, 0, optimized_send_midi=False)
+			self._config_button = ButtonElement(is_momentary, MIDI_CC_TYPE, 0, 0, optimized_send_midi=False)	# Control goes through here on LP, no real equivalent in APCmini (I don't think)
 			self._config_button.add_value_listener(self._config_value)
-			top_buttons = [ConfigurableButtonElement(is_momentary, MIDI_CC_TYPE, 0, 104 + index) for index in range(8)]
+			top_buttons = [ConfigurableButtonElement(is_momentary, MIDI_NOTE_TYPE, 0, 64 + index) for index in range(8)]
 			side_buttons = [ConfigurableButtonElement(is_momentary, MIDI_NOTE_TYPE, 0, SIDE_NOTES[index]) for index in range(8)]
 			top_buttons[0].name = 'Bank_Select_Up_Button'
 			top_buttons[1].name = 'Bank_Select_Down_Button'
@@ -111,10 +115,10 @@ class Launchpad(ControlSurface):
 
 	def _combine_active_instances():
 		support_devices = False
-		for instance in Launchpad._active_instances:
+		for instance in APCmini._active_instances:
 			support_devices |= (instance._device_component != None)
 		offset = 0
-		for instance in Launchpad._active_instances:
+		for instance in APCmini._active_instances:
 			instance._activate_combination_mode(offset, support_devices)
 			offset += instance._selector._session.width()
 
@@ -127,31 +131,31 @@ class Launchpad(ControlSurface):
 			self._selector._session.link_with_track_offset(track_offset)
 
 	def _do_combine(self):
-		if (DO_COMBINE and (self not in Launchpad._active_instances)):
-			Launchpad._active_instances.append(self)
-			Launchpad._combine_active_instances()
+		if (DO_COMBINE and (self not in APCmini._active_instances)):
+			APCmini._active_instances.append(self)
+			APCmini._combine_active_instances()
 
 	def _do_uncombine(self):
-		if self in Launchpad._active_instances:
-			Launchpad._active_instances.remove(self)
+		if self in APCmini._active_instances:
+			APCmini._active_instances.remove(self)
 			if(Settings.SESSION__LINK):
 				self._selector._session.unlink()
 			if(Settings.STEPSEQ__LINK_WITH_SESSION):
 				self._selector._stepseq.unlink()
-			Launchpad._combine_active_instances()
+			APCmini._combine_active_instances()
 
 	def refresh_state(self):
 		ControlSurface.refresh_state(self)
 		self.schedule_message(5, self._update_hardware)
 
 	def handle_sysex(self, midi_bytes):
-		if len(midi_bytes) == 8:
-			if midi_bytes[1:5] == (0, 32, 41, 6):
-				response = long(midi_bytes[5])
-				response += long(midi_bytes[6]) << 8
-				if response == Live.Application.encrypt_challenge2(self._challenge):
-					self._suppress_send_midi = False
-					self.set_enabled(True)
+		# if len(midi_bytes) == 8:
+		# if midi_bytes[1:5] == (0, 32, 41, 6):
+		# response = long(midi_bytes[5])
+		# response += long(midi_bytes[6]) << 8
+		# if response == Live.Application.encrypt_challenge2(self._challenge):
+		self._suppress_send_midi = False
+		self.set_enabled(True)
 
 	def build_midi_map(self, midi_map_handle):
 		ControlSurface.build_midi_map(self, midi_map_handle)
@@ -159,8 +163,8 @@ class Launchpad(ControlSurface):
 			if self._selector._sub_mode_index[self._selector._mode_index] > 0:  # disable midi map rebuild for instrument mode to prevent light feedback errors
 				new_channel = self._selector.channel_for_current_mode()
 				# self.log_message(str(new_channel))
-				for note in DRUM_NOTES:
-					self._translate_message(MIDI_NOTE_TYPE, note, 0, note, new_channel)
+				# for note in DRUM_NOTES:
+				#	self._translate_message(MIDI_NOTE_TYPE, note, 0, note, new_channel)
 
 	def _send_midi(self, midi_bytes, optimized=None):
 		sent_successfully = False
@@ -175,7 +179,8 @@ class Launchpad(ControlSurface):
 		self._suppress_send_midi = True
 		self.set_enabled(False)
 		self._suppress_send_midi = False
-		self._send_challenge()
+		# self._send_challenge()
+		self.set_enabled(True)			# Enable anyways, without checking
 
 	def _send_challenge(self):
 		for index in range(4):

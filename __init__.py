@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from Launchpad import Launchpad
+from APCmini import APCmini
 
 
 def create_instance(c_instance):
 	""" Creates and returns the Launchpad script """
-	return Launchpad(c_instance)
+	return APCmini(c_instance)
 
 
 from _Framework.Capabilities import *  # noqa

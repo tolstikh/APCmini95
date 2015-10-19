@@ -82,4 +82,4 @@ class SpecialSessionComponent(SessionComponent):
 						#self._parent._parent.log_message("index:"+str(index))
 						button.turn_off()
 				else:
-					button.send_value(4)
+					button.send_value(0)

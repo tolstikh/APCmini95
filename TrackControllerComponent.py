@@ -160,17 +160,17 @@ class TrackControllerComponent(MixerComponent):
 		if self.is_enabled():
 			if self._prev_track_button != None:
 				if self.selected_track_idx > 0:
-					self._prev_track_button.set_on_off_values(GREEN_FULL, GREEN_FULL)
+					self._prev_track_button.set_on_off_values(RED_FULL, LED_OFF)
 					self._prev_track_button.turn_on()
 				else:
-					self._prev_track_button.set_on_off_values(GREEN_THIRD, GREEN_THIRD)
+					self._prev_track_button.set_on_off_values(RED_FULL, RED_BLINK)
 					self._prev_track_button.turn_off()
 			if self._next_track_button != None :
 				if self.selected_track_idx < len(self.song().tracks) - 1:
-					self._next_track_button.set_on_off_values(GREEN_FULL, GREEN_FULL)
+					self._next_track_button.set_on_off_values(RED_FULL, RED_BLINK)
 					self._next_track_button.turn_on()
 				else:
-					self._next_track_button.set_on_off_values(GREEN_THIRD, GREEN_THIRD)
+					self._next_track_button.set_on_off_values(RED_FULL, LED_OFF)
 					self._next_track_button.turn_off()
 
 	def set_next_track_button(self, button):
@@ -215,14 +215,14 @@ class TrackControllerComponent(MixerComponent):
 		# tracks
 		if self.is_enabled():
 			if self._prev_scene_button != None:
-				self._prev_scene_button.set_on_off_values(GREEN_FULL, GREEN_THIRD)
+				self._prev_scene_button.set_on_off_values(RED_FULL, LED_OFF)
 				if self.selected_scene_idx > 0:
 					self._prev_scene_button.turn_on()
 				else:
 					self._prev_scene_button.turn_off()
 
 			if self._next_scene_button != None:
-				self._next_scene_button.set_on_off_values(GREEN_FULL, GREEN_THIRD)
+				self._next_scene_button.set_on_off_values(RED_FULL, LED_OFF)
 				if self.selected_scene_idx < len(self.song().scenes) - 1:
 					self._next_scene_button.turn_on()
 				else:

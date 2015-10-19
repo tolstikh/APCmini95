@@ -1,23 +1,32 @@
 # -*- coding: utf-8 -*-
 # flake8: noqa
 
-# LaunchPad Colours
-LED_OFF = 4
+# // APC Colors for 5x8 clip matrix
+# var APC_COLOR_BLACK        = 0;   // off, 
+# var APC_COLOR_GREEN        = 1;   // green, 7-127 also green
+# var APC_COLOR_GREEN_BLINK  = 2;   // green blink, 
+# var APC_COLOR_RED          = 3;   // red, 
+# var APC_COLOR_RED_BLINK    = 4;   // red blink, 
+# var APC_COLOR_YELLOW       = 5;   // yellow, 
+# var APC_COLOR_YELLOW_BLINK = 6;   // yellow blink,
 
-RED_FULL = 7
-RED_HALF = 6
-RED_THIRD = 5
-RED_BLINK = 11
+# APCmini colours
+LED_OFF = 0
 
-GREEN_FULL = 52
-GREEN_HALF = 36
-GREEN_THIRD = 20
-GREEN_BLINK = 56
+GREEN_FULL = 1
+GREEN_HALF = 1
+GREEN_THIRD = 1
+GREEN_BLINK = 2
 
-AMBER_FULL = ((RED_FULL + GREEN_FULL) - 4)
-AMBER_HALF = ((RED_HALF + GREEN_HALF) - 4)
-AMBER_THIRD = ((RED_THIRD + GREEN_THIRD) - 4)
-AMBER_BLINK = ((AMBER_FULL - 4) + 8)
+RED_FULL = 3
+RED_HALF = 3
+RED_THIRD = 3
+RED_BLINK = 4
+
+AMBER_FULL = 5
+AMBER_HALF = 5
+AMBER_THIRD = 5
+AMBER_BLINK = 6
 
 # Scales
 KEY_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
